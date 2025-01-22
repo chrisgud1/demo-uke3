@@ -12,7 +12,7 @@ class DeckClient {
 
     async createDeck() {
         try {
-            const response = await fetch('http://localhost:8000/temp/deck', { 
+            const response = await fetch('/temp/deck', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

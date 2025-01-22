@@ -1,15 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/package.json",
-  "name": "card-deck-api",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "Card Deck API Server",
-  "main": "script.mjs",
   "dependencies": {
     "express": "^4.21.2"
-  },
-  "scripts": {
-    "start": "node script.mjs",
-    "dev": "nodemon script.mjs"
   }
 }
