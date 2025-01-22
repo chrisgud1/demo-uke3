@@ -5,12 +5,10 @@ import deckManager from './utils/deckManager.mjs';
 const server = express();
 const port = (process.env.PORT || 8000);
 
-server.set('port', port);
-server.use(express.static('public'));
-
-// Add body parser middleware
+// These middleware configurations must come BEFORE route definitions
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
+server.use(express.static('public'));
 
 function getRoot(req, res, next) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
@@ -18,7 +16,7 @@ function getRoot(req, res, next) {
 
 server.get("/", getRoot);
 
-// Create new deck endpoint
+// Define POST endpoint for deck creation
 server.post('/temp/deck', (req, res) => {
     try {
         const deckId = deckManager.createDeck();
