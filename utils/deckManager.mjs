@@ -12,19 +12,24 @@ class DeckManager {
     }
 
     createDeck() {
-        const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        const deck = [];
-        
-        for (const suit of suits) {
-            for (const value of values) {
-                deck.push(new Card(suit, value));
+        try {
+            const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+            const deck = [];
+            
+            for (const suit of suits) {
+                for (const value of values) {
+                    deck.push(new Card(suit, value));
+                }
             }
+            
+            const deckId = Date.now().toString();
+            this.decks.set(deckId, deck);
+            return deckId;
+        } catch (error) {
+            console.error('Error creating deck:', error);
+            throw error;
         }
-        
-        const deckId = Date.now().toString();
-        this.decks.set(deckId, deck);
-        return deckId;
     }
 
     shuffleDeck(deckId) {

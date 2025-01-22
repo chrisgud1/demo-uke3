@@ -12,14 +12,29 @@ class DeckClient {
 
     async createDeck() {
         try {
-            const response = await fetch('/temp/deck', { method: 'POST' });
+            const response = await fetch('/temp/deck', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
-            this.currentDeckId = data.deck_id;
-            document.getElementById('currentDeckId').textContent = this.currentDeckId;
-            document.getElementById('shuffleDeck').disabled = false;
-            document.getElementById('drawCard').disabled = false;
+            if (data.deck_id) {
+                this.currentDeckId = data.deck_id;
+                document.getElementById('currentDeckId').textContent = this.currentDeckId;
+                document.getElementById('shuffleDeck').disabled = false;
+                document.getElementById('drawCard').disabled = false;
+            } else {
+                throw new Error('Invalid server response');
+            }
         } catch (error) {
             console.error('Error creating deck:', error);
+            document.getElementById('currentDeckId').textContent = 'Error creating deck';
         }
     }
 

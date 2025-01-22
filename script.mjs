@@ -8,16 +8,30 @@ const port = (process.env.PORT || 8000);
 server.set('port', port);
 server.use(express.static('public'));
 
+// Add body parser middleware
+server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
+
 function getRoot(req, res, next) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 }
 
 server.get("/", getRoot);
 
-// Create new deck
+// Create new deck endpoint
 server.post('/temp/deck', (req, res) => {
-    const deckId = deckManager.createDeck();
-    res.status(HTTP_CODES.SUCCESS.OK).json({ deck_id: deckId });
+    try {
+        const deckId = deckManager.createDeck();
+        res.status(HTTP_CODES.SUCCESS.OK).json({ 
+            deck_id: deckId,
+            success: true 
+        });
+    } catch (error) {
+        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({ 
+            error: 'Failed to create deck',
+            success: false 
+        });
+    }
 });
 
 // Shuffle deck
