@@ -4,12 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo</title>
+    <title>Card Deck Demo</title>
     <link href="css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1>Hello Class</h1>
+    <div class="container">
+        <h1>Card Deck Manager</h1>
+        
+        <div class="controls">
+            <button id="createDeck">Create New Deck</button>
+            <button id="shuffleDeck" disabled>Shuffle Deck</button>
+            <button id="drawCard" disabled>Draw Card</button>
+        </div>
+
+        <div id="deckInfo">
+            <p>Deck ID: <span id="currentDeckId">None</span></p>
+        </div>
+
+        <div id="cardDisplay">
+            <!-- Card will be displayed here -->
+        </div>
+    </div>
+    <script src="js/app.js"></script>
 </body>
 
 </html>

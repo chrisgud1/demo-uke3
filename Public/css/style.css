@@ -1,0 +1,44 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.controls {
+    margin: 20px 0;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#cardDisplay {
+    margin-top: 20px;
+    min-height: 200px;
+}
+
+.card {
+    display: inline-block;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 10px;
+    font-size: 24px;
+    margin: 10px;
+}
+
+.hearts, .diamonds {
+    color: red;
+}
+
+.clubs, .spades {
+    color: black;
+}
