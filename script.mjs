@@ -3,6 +3,7 @@ import HTTP_CODES from './utils/httpCodes.mjs';
 import deckManager from './utils/deckManager.mjs';
 import { createLogger, LOGG_LEVELS } from './modules/log.mjs';
 import fs from 'node:fs/promises';
+import { createRateLimiter } from './modules/rateLimiter.mjs';
 
 const ENABLE_LOGGING = true;
 
@@ -23,6 +24,11 @@ server.use(logger);
 
 // Set the port before using it
 server.set('port', port);
+
+const rateLimiter = createRateLimiter();
+
+// Apply rate limiting to ALL endpoints, not just deck endpoints
+server.use(rateLimiter);
 
 // Global middleware
 server.use(express.json());
