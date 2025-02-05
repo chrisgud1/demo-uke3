@@ -1,14 +1,17 @@
 import express from 'express';
 import HTTP_CODES from './utils/httpCodes.mjs';
 import deckManager from './utils/deckManager.mjs';
+import { rateLimiter, validateDeckId, requestTimer } from './utils/middleware.mjs';
 
 const server = express();
 const port = (process.env.PORT || 8000);
 
-// These middleware configurations must come BEFORE route definitions
+// Global middleware
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(express.static('public'));
+server.use(requestTimer);
+server.use('/temp/deck', rateLimiter);
 
 function getRoot(req, res, next) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
@@ -17,7 +20,7 @@ function getRoot(req, res, next) {
 server.get("/", getRoot);
 
 // Define POST endpoint for deck creation
-server.post('/temp/deck', (req, res) => {
+server.post('/temp/deck', rateLimiter, (req, res) => {
     try {
         const deckId = deckManager.createDeck();
         res.status(HTTP_CODES.SUCCESS.OK).json({ 
@@ -33,7 +36,7 @@ server.post('/temp/deck', (req, res) => {
 });
 
 // Shuffle deck
-server.patch('/temp/deck/shuffle/:deck_id', (req, res) => {
+server.patch('/temp/deck/shuffle/:deck_id', validateDeckId, (req, res) => {
     const success = deckManager.shuffleDeck(req.params.deck_id);
     if (success) {
         res.status(HTTP_CODES.SUCCESS.OK).json({ message: 'Deck shuffled successfully' });
@@ -43,7 +46,7 @@ server.patch('/temp/deck/shuffle/:deck_id', (req, res) => {
 });
 
 // Get deck
-server.get('/temp/deck/:deck_id', (req, res) => {
+server.get('/temp/deck/:deck_id', validateDeckId, (req, res) => {
     const deck = deckManager.getDeck(req.params.deck_id);
     if (deck) {
         res.status(HTTP_CODES.SUCCESS.OK).json({ cards: deck });
@@ -53,7 +56,7 @@ server.get('/temp/deck/:deck_id', (req, res) => {
 });
 
 // Draw card
-server.get('/temp/deck/:deck_id/card', (req, res) => {
+server.get('/temp/deck/:deck_id/card', validateDeckId, (req, res) => {
     const card = deckManager.drawCard(req.params.deck_id);
     if (card) {
         res.status(HTTP_CODES.SUCCESS.OK).json({ card: card });
