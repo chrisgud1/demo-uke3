@@ -4,7 +4,10 @@ import deckManager from './utils/deckManager.mjs';
 import { rateLimiter, validateDeckId, requestTimer } from './utils/middleware.mjs';
 
 const server = express();
-const port = (process.env.PORT || 8000);
+const port = process.env.PORT || 8000;
+
+// Set the port before using it
+server.set('port', port);
 
 // Global middleware
 server.use(express.json());
@@ -65,6 +68,6 @@ server.get('/temp/deck/:deck_id/card', validateDeckId, (req, res) => {
     }
 });
 
-server.listen(server.get('port'), function () {
-    console.log('server running', server.get('port'));
+server.listen(port, () => {
+    console.log('server running on port', port);
 });
