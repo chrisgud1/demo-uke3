@@ -3,7 +3,7 @@ const Tree = function (root) {
 }
 
 const Node = function (data, ...connections) {
-    return { data, connections: [...connections] }
+    return { data, connections: [...connections] };
 }
 
 export function saveTree(tree) {
