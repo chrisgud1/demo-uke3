@@ -183,8 +183,15 @@ function handleSum(req, res) {
     }
 }
 
+// Root endpoint handler
+function handleRoot(req, res) {
+    res.status(HTTP_CODES.SUCCESS.OK).json({
+        message: "Hello World"
+    });
+}
+
 // Route definitions
-server.get("/", getRoot);
+server.get("/", handleRoot);  // Root endpoint
 server.post('/temp/deck', handleCreateDeck);
 server.patch('/temp/deck/shuffle/:deck_id', handleShuffleDeck);
 server.get('/temp/deck/:deck_id', handleGetDeck);
