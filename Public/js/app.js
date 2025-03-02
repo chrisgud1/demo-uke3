@@ -1,8 +1,3 @@
-const express = require('express');
-const app = express();
-
-app.use(express.static('public'));
-
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
