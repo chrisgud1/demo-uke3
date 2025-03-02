@@ -3,6 +3,19 @@ const app = express();
 
 app.use(express.static('public'));
 
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/js/serviceWorker.js')
+            .then(registration => {
+                console.log('ServiceWorker registration successful:', registration.scope);
+            })
+            .catch(err => {
+                console.error('ServiceWorker registration failed:', err);
+            });
+    });
+}
+
 class DeckClient {
     constructor() {
         this.currentDeckId = null;
