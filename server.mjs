@@ -6,9 +6,10 @@ import fs from 'node:fs/promises';
 import { createRateLimiter } from './modules/rateLimiter.mjs';
 
 const ENABLE_LOGGING = true;
-
 const server = express();
-const port = process.env.PORT || 8000;
+
+// Update port to use Render's default if no environment variable is set
+const port = process.env.PORT || 10000; // Changed from 8000 to 10000 for Render
 
 // Create logs directory if it doesn't exist
 try {
