@@ -5,6 +5,9 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "pg": "^8.13.3"
+    "pg": "^8.13.3",
+    "sequelize": "^6.37.1",
+    "dotenv": "^16.4.5",
+    "sqlite3": "^5.1.7"
   }
 }
