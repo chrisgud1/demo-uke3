@@ -22,6 +22,20 @@ try {
     console.error('Error creating logs directory:', error);
 }
 
+// Add this function to server.mjs (near the logs directory creation)
+async function ensureIconsExist() {
+  const iconsDir = './Public/icons';
+  try {
+    await fs.mkdir(iconsDir, { recursive: true });
+    console.log('Icons directory exists or was created');
+  } catch (error) {
+    console.error('Error ensuring icons directory:', error);
+  }
+}
+
+// Call this function before starting the server
+await ensureIconsExist();
+
 const logger = createLogger(LOGG_LEVELS.VERBOSE);
 
 // Add logger middleware before other middleware
@@ -236,6 +250,22 @@ server.get('/temp/deck/:deck_id/card', handleDrawCard);
 server.get('/temp/poem', handleGetPoem);
 server.get('/temp/quote', handleGetQuote);
 server.post('/temp/sum/:a/:b', handleSum);
+
+// Add to server.mjs after your other routes
+// Fallback route for missing icons to avoid 404s
+server.get('/icons/:iconName', (req, res) => {
+  // Try to serve the requested icon
+  const iconPath = `./Public/icons/${req.params.iconName}`;
+  fs.access(iconPath)
+    .then(() => {
+      // Icon exists, serve it
+      res.sendFile(req.params.iconName, { root: './Public/icons' });
+    })
+    .catch(() => {
+      // Icon doesn't exist, serve template SVG instead
+      res.sendFile('icon-template.svg', { root: './Public/icons' });
+    });
+});
 
 server.listen(port, () => {
     console.log('server running on port', port);
