@@ -203,11 +203,10 @@ function handleSum(req, res) {
     }
 }
 
-// Root endpoint handler
-function handleRoot(_req, res) {
-    res.status(HTTP_CODES.SUCCESS.OK).json({
-        message: "Hello World"
-    });
+// Root endpoint handler - update to serve the index.html file
+function handleRoot(req, res) {
+    // Serve the index.html file rather than sending JSON
+    res.sendFile('index.html', { root: './Public' });
 }
 
 // Route definitions
