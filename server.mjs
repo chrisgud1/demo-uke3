@@ -7,6 +7,7 @@ import { createRateLimiter } from './modules/rateLimiter.mjs';
 
 const ENABLE_LOGGING = true;
 const server = express();
+const { Sequelize } = require('sequelize');
 
 require("dotenv").config();
 
@@ -81,9 +82,28 @@ const quotes = [
     }
 ];
 
+const sequelize = new Sequelize(process.env.DB_URL,{
+    dialect: 'sqlite',
+    storage: 'db.sqlite',
+    logging: false
+});
+
+sequelize
+.sync()
+.then(() => {
+    console.log('Database connected')
+})
+.catch((err) => {
+    console.log(err)
+});
+
+
+
 function getRoot(_req, res) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 }
+
+
 
 // Route handler functions
 function handleDrawCard(req, res) {
