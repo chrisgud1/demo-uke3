@@ -38,7 +38,25 @@ server.use(rateLimiter);
 // Global middleware
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
-server.use(express.static('public'));
+
+// Add explicit MIME type handling
+server.use((req, res, next) => {
+  if (req.url.endsWith('.js')) {
+    res.type('application/javascript');
+  } else if (req.url.endsWith('.css')) {
+    res.type('text/css');
+  } else if (req.url.endsWith('.json')) {
+    res.type('application/json');
+  } else if (req.url.endsWith('.svg')) {
+    res.type('image/svg+xml');
+  } else if (req.url.endsWith('.png')) {
+    res.type('image/png');
+  }
+  next();
+});
+
+// Place this BEFORE your static middleware
+server.use(express.static('Public')); // Note the uppercase 'P'
 
 // Collection of poems
 const poems = [
