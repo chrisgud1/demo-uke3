@@ -4,12 +4,13 @@ import deckManager from './utils/deckManager.mjs';
 import { createLogger, LOGG_LEVELS } from './modules/log.mjs';
 import fs from 'node:fs/promises';
 import { createRateLimiter } from './modules/rateLimiter.mjs';
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const ENABLE_LOGGING = true;
 const server = express();
-const { Sequelize } = require('sequelize');
-
-require("dotenv").config();
 
 // Update port to use Render's default if no environment variable is set
 const port = process.env.PORT || 10000; // Changed from 8000 to 10000 for Render
@@ -82,7 +83,7 @@ const quotes = [
     }
 ];
 
-const sequelize = new Sequelize(process.env.DB_URL,{
+const sequelize = new Sequelize(process.env.DB_URL, {
     dialect: 'sqlite',
     storage: 'db.sqlite',
     logging: false
@@ -97,13 +98,9 @@ sequelize
     console.log(err)
 });
 
-
-
 function getRoot(_req, res) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 }
-
-
 
 // Route handler functions
 function handleDrawCard(req, res) {
