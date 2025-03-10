@@ -130,6 +130,193 @@ sequelize
     console.log(err)
 });
 
+// Define Deck model
+const Deck = sequelize.define('Deck', {
+  id: {
+    type: Sequelize.STRING,
+    primaryKey: true
+  },
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    defaultValue: 'My Deck'
+  },
+  cards: {
+    type: Sequelize.TEXT, // Store serialized cards
+    allowNull: false
+  },
+  shuffled: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
+  cardsRemaining: {
+    type: Sequelize.INTEGER
+  }
+});
+
+// Database CRUD handler functions
+async function handleSaveDeck(req, res) {
+  try {
+    const deckId = req.params.deck_id;
+    const deck = deckManager.getDeck(deckId);
+    
+    if (!deck) {
+      return res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({ 
+        error: 'Deck not found'
+      });
+    }
+    
+    // Create or update deck in database
+    const [dbDeck, created] = await Deck.findOrCreate({
+      where: { id: deckId },
+      defaults: {
+        name: req.body.name || 'My Deck',
+        cards: JSON.stringify(deck),
+        cardsRemaining: deck.length,
+        shuffled: req.body.shuffled || false
+      }
+    });
+    
+    // If deck already exists, update it
+    if (!created) {
+      await dbDeck.update({
+        cards: JSON.stringify(deck),
+        cardsRemaining: deck.length,
+        shuffled: req.body.shuffled || dbDeck.shuffled,
+        name: req.body.name || dbDeck.name
+      });
+    }
+    
+    res.status(HTTP_CODES.SUCCESS.OK).json({
+      success: true,
+      deckId: deckId,
+      created: created
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({
+      error: 'Failed to save deck to database'
+    });
+  }
+}
+
+async function handleGetSavedDecks(req, res) {
+  try {
+    const decks = await Deck.findAll({
+      attributes: ['id', 'name', 'cardsRemaining', 'shuffled', 'createdAt']
+    });
+    
+    res.status(HTTP_CODES.SUCCESS.OK).json({
+      success: true,
+      decks: decks
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({
+      error: 'Failed to retrieve decks from database'
+    });
+  }
+}
+
+async function handleGetSavedDeck(req, res) {
+  try {
+    const deckId = req.params.deck_id;
+    const dbDeck = await Deck.findByPk(deckId);
+    
+    if (!dbDeck) {
+      return res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({ 
+        error: 'Deck not found in database'
+      });
+    }
+    
+    // Load the deck from the database into memory if needed
+    if (!deckManager.getDeck(deckId)) {
+      const cards = JSON.parse(dbDeck.cards);
+      deckManager.decks.set(deckId, cards);
+    }
+    
+    res.status(HTTP_CODES.SUCCESS.OK).json({
+      success: true,
+      deck: {
+        id: dbDeck.id,
+        name: dbDeck.name,
+        cardsRemaining: dbDeck.cardsRemaining,
+        shuffled: dbDeck.shuffled,
+        createdAt: dbDeck.createdAt
+      }
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({
+      error: 'Failed to retrieve deck from database'
+    });
+  }
+}
+
+async function handleUpdateDeckName(req, res) {
+  try {
+    const deckId = req.params.deck_id;
+    const { name } = req.body;
+    
+    if (!name) {
+      return res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({
+        error: 'Name is required'
+      });
+    }
+    
+    const dbDeck = await Deck.findByPk(deckId);
+    
+    if (!dbDeck) {
+      return res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({ 
+        error: 'Deck not found in database'
+      });
+    }
+    
+    await dbDeck.update({ name });
+    
+    res.status(HTTP_CODES.SUCCESS.OK).json({
+      success: true,
+      deck: {
+        id: dbDeck.id,
+        name: dbDeck.name
+      }
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({
+      error: 'Failed to update deck name'
+    });
+  }
+}
+
+async function handleDeleteDeck(req, res) {
+  try {
+    const deckId = req.params.deck_id;
+    const dbDeck = await Deck.findByPk(deckId);
+    
+    if (!dbDeck) {
+      return res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({ 
+        error: 'Deck not found in database'
+      });
+    }
+    
+    await dbDeck.destroy();
+    
+    // Also remove from memory
+    deckManager.decks.delete(deckId);
+    
+    res.status(HTTP_CODES.SUCCESS.OK).json({
+      success: true,
+      message: `Deck ${deckId} deleted successfully`
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).json({
+      error: 'Failed to delete deck'
+    });
+  }
+}
+
 function getRoot(_req, res) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 }
@@ -266,6 +453,12 @@ server.get('/icons/:iconName', (req, res) => {
       res.sendFile('icon-template.svg', { root: './Public/icons' });
     });
 });
+
+server.post('/api/decks/:deck_id/save', handleSaveDeck);
+server.get('/api/decks', handleGetSavedDecks);
+server.get('/api/decks/:deck_id', handleGetSavedDeck);
+server.patch('/api/decks/:deck_id', handleUpdateDeckName);
+server.delete('/api/decks/:deck_id', handleDeleteDeck);
 
 server.listen(port, () => {
     console.log('server running on port', port);
