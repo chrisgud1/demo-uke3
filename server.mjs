@@ -79,7 +79,7 @@ const quotes = [
     }
 ];
 
-function getRoot(req, res) {
+function getRoot(_req, res) {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 }
 
@@ -100,7 +100,7 @@ function handleDrawCard(req, res) {
     }
 }
 
-function handleGetPoem(req, res) {
+function handleGetPoem(_req, res) {
     const randomIndex = Math.floor(Math.random() * poems.length);
     const poem = poems[randomIndex];
     
@@ -112,7 +112,7 @@ function handleGetPoem(req, res) {
     });
 }
 
-function handleGetQuote(req, res) {
+function handleGetQuote(_req, res) {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const quote = quotes[randomIndex];
     
@@ -123,7 +123,7 @@ function handleGetQuote(req, res) {
     });
 }
 
-function handleCreateDeck(req, res) {
+function handleCreateDeck(_req, res) {
     try {
         const deckId = deckManager.createDeck();
         res.locals.deck_id = deckId;
@@ -185,7 +185,7 @@ function handleSum(req, res) {
 }
 
 // Root endpoint handler
-function handleRoot(req, res) {
+function handleRoot(_req, res) {
     res.status(HTTP_CODES.SUCCESS.OK).json({
         message: "Hello World"
     });

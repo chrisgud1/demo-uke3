@@ -1,4 +1,3 @@
-import { setUncaughtExceptionCaptureCallback } from "node:process"
 
 const HTTP_CODES = {
 
